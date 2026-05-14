@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -70,17 +71,18 @@ void netbuf_compact(netbuf *buf) {
 }
 
 void netbuf_send(int client_socket, netbuf *packet_buf) {
-    netbuf *wrapper = netbuf_new(packet_buf->size + 5); 
+    netbuf *wrapper = netbuf_new(packet_buf->size + 5);
+    write_varint(wrapper, (varint)packet_buf->size);
+    size_t header_len = wrapper->offset;
+    memcpy(wrapper->data + header_len, packet_buf->data, packet_buf->size);
+    size_t total = header_len + packet_buf->size;
 
-    /* Length of whole packet (Packet ID length + Data length) */
-    write_varint(wrapper, packet_buf->size);
+    printf("Real Bytes Sent: ");
+    for(int i=0; i < (total < 10 ? total : 10); i++) {
+        printf("%02X ", (uint8_t)wrapper->data[i]);
+    }
+    printf("\n");
 
-    /* Packet data */
-    memcpy(wrapper->data + wrapper->offset, packet_buf->data, packet_buf->size);
-    wrapper->size = wrapper->offset + packet_buf->size;
-
-    /* Send with socket */
-    send(client_socket, wrapper->data, wrapper->size, 0);
-
+    send(client_socket, wrapper->data, total, 0);
     netbuf_free(wrapper);
 }

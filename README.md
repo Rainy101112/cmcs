@@ -11,3 +11,6 @@ And now, it is time to **end them all**. Let's hug with C to create a better fut
 
 ## What does "CMCS" mean?
 *C Minecraft Server.*
+
+## Thirdparty
+1. [libuuid](https://git.shangtai.net/staffan/libuuid)
