@@ -32,5 +32,10 @@ void handle_handshake(client_connection *conn, varint packet_id) {
         printf("  Next:    %s\n", (packet.next_state == 1 ? "Status" : "Login"));
     }
 
-    conn->state = packet.next_state;
+    if (packet.next_state == STATE_STATUS || packet.next_state == STATE_LOGIN) {
+        conn->state = packet.next_state;
+    } else {
+        printf("Invalid next_state: %d, disconnecting\n", packet.next_state);
+        conn->in_buf->error = true;
+    }
 }

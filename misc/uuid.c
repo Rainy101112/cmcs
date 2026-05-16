@@ -3,7 +3,7 @@
 
 #include "uuid.h"
 
-const unsigned char hex[16]="0123456789abcdef";
+const unsigned char hex[16]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
 void uuid_generate_random(uuid_t out) {
 	int i, j, rnd;
@@ -50,7 +50,12 @@ void uuid_parse(const char *in, uuid_t uuid) {
 			case '-':
 				break;
 			default:
-				uuid[j++]=(_hex2dec(in[i++]) << 4) | _hex2dec(in[i]);
+			{
+				int hi = _hex2dec(in[i]);
+				i++;
+				int lo = _hex2dec(in[i]);
+				uuid[j++] = (hi << 4) | lo;
+			}
 		}
 
 		i++;
@@ -81,7 +86,7 @@ void uuid_unparse(const uuid_t uuid, char *out) {
 }
 
 void uuid_copy(uuid_t dst, const uuid_t src) {
-	int i;
+	size_t i;
 	for (i=0;i<sizeof(uuid_t);i++) {
 		dst[i]=src[i];
 	}

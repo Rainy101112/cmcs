@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -24,6 +25,24 @@ netbuf *netbuf_new(size_t initial_capacity) {
 void netbuf_free(netbuf *buf) {
     free(buf->data);
     free(buf);
+}
+
+void netbuf_expand(netbuf *buf, size_t min_additional) {
+    size_t needed = buf->size + min_additional;
+    if (needed <= buf->capacity) return;
+
+    size_t new_capacity = buf->capacity;
+    while (new_capacity < needed) {
+        new_capacity *= 2;
+    }
+
+    uint8_t *new_data = realloc(buf->data, new_capacity);
+    if (!new_data) {
+        buf->error = true;
+        return;
+    }
+    buf->data = new_data;
+    buf->capacity = new_capacity;
 }
 
 uint8_t read_byte(netbuf *buf) {
@@ -78,11 +97,20 @@ void netbuf_send(int client_socket, netbuf *packet_buf) {
     size_t total = header_len + packet_buf->size;
 
     printf("Real Bytes Sent: ");
-    for(int i=0; i < (total < 10 ? total : 10); i++) {
+    for(size_t i=0; i < (total < 10 ? total : 10); i++) {
         printf("%02X ", (uint8_t)wrapper->data[i]);
     }
     printf("\n");
 
-    send(client_socket, wrapper->data, total, 0);
+    size_t sent = 0;
+    while (sent < total) {
+        ssize_t n = send(client_socket, wrapper->data + sent, total - sent, 0);
+        if (n < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) continue;
+            perror("send error");
+            break;
+        }
+        sent += (size_t)n;
+    }
     netbuf_free(wrapper);
 }

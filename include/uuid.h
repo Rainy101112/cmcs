@@ -5,6 +5,8 @@
 #define RAND_LENGTH 2
 #elif __NetBSD__
 #define RAND_LENGTH 4
+#elif __linux__
+#define RAND_LENGTH 4
 #else
 #warning "Unknown platform, assuming 4 bytes of randomness from rand()"
 #define RAND_LENGTH 4

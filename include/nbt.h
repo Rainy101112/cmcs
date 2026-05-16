@@ -26,6 +26,8 @@ void nbt_begin_compound(netbuf *buf, const char *name);
 void nbt_begin_root_compound(netbuf *buf);
 void nbt_end_compound(netbuf *buf);
 void nbt_begin_list(netbuf *buf, const char *name, nbt_tag_type element_type, int32_t count);
+void nbt_end_list(netbuf *buf);
+void nbt_write_string_value(netbuf *buf, const char *value);
 
 void nbt_write_byte(netbuf *buf, const char *name, int8_t value);
 void nbt_write_short(netbuf *buf, const char *name, int16_t value);
@@ -39,5 +41,8 @@ void write_be32_to_buf(netbuf *buf, uint32_t value);
 void write_long_to_buf(netbuf *buf, int64_t value);
 void write_double_to_buf(netbuf *buf, double value);
 void write_float_to_buf(netbuf *buf, float value);
+
+// 调试工具
+void nbt_debug_dump(const uint8_t *data, size_t size);
 
 #endif

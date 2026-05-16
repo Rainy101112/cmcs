@@ -84,5 +84,5 @@ void handle_login_start(client_connection *conn) {
     printf("Player %s joined the game!\n", conn->player_name);
 
     send_login_play(conn);
-    send_player_position(conn);
+    send_world_loading(conn);
 }

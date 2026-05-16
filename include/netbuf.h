@@ -15,6 +15,7 @@ typedef struct {
 
 netbuf *netbuf_new(size_t initial_capacity);
 void netbuf_free(netbuf *buf);
+void netbuf_expand(netbuf *buf, size_t min_additional);
 
 uint8_t read_byte(netbuf *buf);
 void write_byte(netbuf *buf, uint8_t byte);

@@ -45,7 +45,7 @@ varlong read_varlong(netbuf *buf) {
         }
     } while ((read & 0x80) != 0);
 
-    return (varint)result;
+    return (varlong)result;
 }
 
 uint16_t read_ushort(netbuf *buf) {
